@@ -1,12 +1,10 @@
 [package]
-name = "lib-neural-network"
+name = "lib-simulation"
 version = "0.1.0"
-authors = ["Jonas Eichenberger <jo.eichenberger@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+nalgebra = { version = "0.31.4", features = ["rand-no-std"] }
 rand = "0.8"
-rand_chacha = "0.3"
-approx = "0.5.1"
