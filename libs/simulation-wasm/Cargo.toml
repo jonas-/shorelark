@@ -2,12 +2,12 @@
 name = "lib-simulation-wasm"
 version = "0.1.0"
 authors = ["Jonas Eichenberger <jo.eichenberger@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[lib]
-crate-type = ["cdylib"]
+# [lib]
+# crate-type = ["cdylib"]
 
 [dependencies]
 rand = "0.8"

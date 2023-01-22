@@ -8,15 +8,12 @@ pub fn whos_that_dog() -> String {
     "Test".into()
 }
 
-#[wasm_bindgen]
 pub struct Simulation {
     rng: ThreadRng,
     sim: sim::Simulation,
 }
 
-#[wasm_bindgen]
 impl Simulation {
-    #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         let mut rng = thread_rng();
         let sim = sim::Simulation::random(&mut rng);
@@ -24,9 +21,8 @@ impl Simulation {
         Self { rng, sim }
     }
 
-    pub fn world(&self) -> JsValue {
-        let world = World::from(self.sim.world());
-        JsValue::from_serde(&world).unwrap()
+    pub fn world(&self) -> World {
+        World::from(self.sim.world())
     }
 }
 
@@ -54,8 +50,8 @@ pub struct World {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct Animal {
-    pub x: f32,
-    pub y: f32,
+    pub x: f64,
+    pub y: f64,
 }
 
 // ^ This model is smaller than `lib_simulation::Animal` - that's

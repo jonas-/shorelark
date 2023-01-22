@@ -1,5 +1,2 @@
 [workspace]
-members = [
-    "libs/*",
-    "playground"
-]
+members = ["libs/*", "playground", "simulation-trunk"]
