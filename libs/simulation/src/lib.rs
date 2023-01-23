@@ -1,4 +1,5 @@
 use nalgebra as na;
+use rand::prelude::*;
 use rand::{Rng, RngCore};
 
 pub struct Simulation {
@@ -6,15 +7,15 @@ pub struct Simulation {
 }
 #[derive(Debug)]
 pub struct World {
-    animals: Vec<Animal>,
-    foods: Vec<Food>,
+    pub animals: Vec<Animal>,
+    pub foods: Vec<Food>,
 }
 
 #[derive(Debug)]
 pub struct Animal {
-    position: na::Point2<f64>,
-    rotation: na::Rotation2<f64>,
-    speed: f64,
+    pub position: na::Point2<f64>,
+    pub rotation: na::Rotation2<f64>,
+    pub speed: f64,
 }
 
 #[derive(Debug)]
@@ -23,6 +24,11 @@ pub struct Food {
 }
 
 impl Simulation {
+    pub fn new() -> Self {
+        let mut rng = thread_rng();
+        Simulation::random(&mut rng)
+    }
+
     pub fn random(rng: &mut dyn RngCore) -> Self {
         Self {
             world: World::random(rng),

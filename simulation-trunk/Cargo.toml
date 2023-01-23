@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 wasm-bindgen = "0.2"
-lib-simulation-wasm = { path = "../libs/simulation-wasm" }
+lib-simulation = { path = "../libs/simulation" }
 lib-test-lib = { path = "../libs/test-lib" }
 log = "0.4"
 wasm-logger = "0.2"

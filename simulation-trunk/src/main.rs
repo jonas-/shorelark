@@ -1,4 +1,6 @@
-use lib_simulation_wasm as sim;
+use std::f32::consts::PI;
+
+use lib_simulation as sim;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
@@ -10,6 +12,38 @@ extern "C" {
 #[wasm_bindgen]
 pub fn greet(number_string: String) {
     alert(format!("From Jonas: {}!", number_string));
+}
+
+pub fn draw_triangle(
+    context: &web_sys::CanvasRenderingContext2d,
+    x: f64,
+    y: f64,
+    size: f64,
+    rotation: f64,
+) {
+    context.begin_path();
+    context.move_to(
+        x - rotation.sin() * size * 1.5,
+        y + rotation.cos() * size * 1.5,
+    );
+    context.line_to(
+        x - (rotation + 2.0 / 3.0 * PI as f64).sin() * size,
+        y + (rotation + 2.0 / 3.0 * PI as f64).cos() * size,
+    );
+    context.line_to(
+        x - (rotation + 4.0 / 3.0 * PI as f64).sin() * size,
+        y + (rotation + 4.0 / 3.0 * PI as f64).cos() * size,
+    );
+    context.line_to(
+        x - rotation.sin() * size * 1.5,
+        y + rotation.cos() * size * 1.5,
+    );
+
+    context.stroke()
+}
+
+pub fn draw_square(context: &web_sys::CanvasRenderingContext2d, x: f64, y: f64, size: f64) {
+    context.fill_rect(x, y, size, size);
 }
 
 fn main() {
@@ -26,11 +60,18 @@ fn main() {
         .map_err(|_| ())
         .unwrap();
     let viewport_scale = web_sys::window().unwrap().device_pixel_ratio() as f64;
-    let viewport_width = canvas.width() as f64;
-    let viewport_height = canvas.height() as f64;
+    let viewport_width = 800.0;
+    let viewport_height = 500.0;
 
     canvas.set_width((viewport_width * viewport_scale) as u32);
     canvas.set_height((viewport_height * viewport_scale) as u32);
+
+    canvas
+        .set_attribute(
+            "style",
+            &format!("width:{viewport_width}px; height:{viewport_height}px"),
+        )
+        .unwrap();
 
     let context = canvas
         .get_context("2d")
@@ -43,14 +84,22 @@ fn main() {
 
     context.set_fill_style(&JsValue::from("rgb(0, 0, 0)"));
 
-    for animal in simulation.world().animals {
-        context.fill_rect(
+    for animal in &simulation.world().animals {
+        draw_triangle(
+            &context,
+            animal.position().x * viewport_width,
+            animal.position().y * viewport_height,
+            5.0 * viewport_scale,
+            animal.rotation.angle(),
+        );
+
+        /*draw_square(
+            &context,
             animal.x * viewport_width,
             animal.y * viewport_height,
             15.0,
-            15.0,
-        );
+        )*/
     }
 
-    context.stroke();
+    //context.stroke();
 }
