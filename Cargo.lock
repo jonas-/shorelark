@@ -291,6 +291,7 @@ dependencies = [
  "lib-simulation",
  "lib-test-lib",
  "log",
+ "rand",
  "wasm-bindgen",
  "wasm-logger",
  "web-sys",
