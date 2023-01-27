@@ -4,13 +4,16 @@ use rand::seq::SliceRandom;
 use rand::Rng;
 use rand::RngCore;
 
-pub use self::{chromosome::*, crossover::*, individual::*, mutation::*, selection::*};
+pub use self::{
+    chromosome::*, crossover::*, individual::*, mutation::*, selection::*, statistics::*,
+};
 
 mod chromosome;
 mod crossover;
 mod individual;
 mod mutation;
 mod selection;
+mod statistics;
 
 pub struct GeneticAlgorithm<S> {
     selection_method: S,
@@ -34,13 +37,13 @@ where
         }
     }
 
-    pub fn evolve<I>(&self, rng: &mut dyn RngCore, population: &[I]) -> Vec<I>
+    pub fn evolve<I>(&self, rng: &mut dyn RngCore, population: &[I]) -> (Vec<I>, Statistics)
     where
         I: Individual,
     {
         assert!(!population.is_empty());
 
-        (0..population.len())
+        let new_population = (0..population.len())
             .map(|_| {
                 // selection
                 let parent_a = self.selection_method.select(rng, population).chromosome();
@@ -55,7 +58,11 @@ where
                 // convert Chromosome back into individual
                 I::create(child)
             })
-            .collect()
+            .collect();
+
+        let stats = Statistics::new(population);
+
+        (new_population, stats)
     }
 }
 
@@ -65,7 +72,7 @@ mod tests {
     use rand::SeedableRng;
     use rand_chacha::ChaCha8Rng;
 
-    fn individual(genes: &[f32]) -> TestIndividual {
+    fn individual(genes: &[f64]) -> TestIndividual {
         let chromosome = genes.iter().cloned().collect();
 
         TestIndividual::create(chromosome)
@@ -89,8 +96,8 @@ mod tests {
         ];
 
         // check fitness improved
-        let len = population.len() as f32;
-        let average_fitness_init = population.iter().map(|x| x.fitness()).sum::<f32>() / len;
+        let len = population.len() as f64;
+        let average_fitness_init = population.iter().map(|x| x.fitness()).sum::<f64>() / len;
 
         println!(
             "Average fitness - initial population: {}",
@@ -105,7 +112,7 @@ mod tests {
         }
 
         // check fitness improved
-        let average_fitness_evolve = population.iter().map(|x| x.fitness()).sum::<f32>() / len;
+        let average_fitness_evolve = population.iter().map(|x| x.fitness()).sum::<f64>() / len;
 
         println!(
             "Average fitness - evolved population: {}",

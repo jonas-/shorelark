@@ -4,19 +4,19 @@ pub struct GaussianMutation {
     /// Probability of changing a gene
     /// - 0.0 = no genes will be changed
     /// - 1.0 = all genes will be changed
-    chance: f32,
+    chance: f64,
 
     /// Magnitude of that change:
     /// - 0.0 = touched genes will not be modified
     /// - 3.0 = touched genes will be += or -= by at most 3.0
-    coeff: f32,
+    coeff: f64,
 }
 
 impl GaussianMutation {
-    pub fn new(chance: f32, coeff: f32) -> Self {
+    pub fn new(chance: f64, coeff: f64) -> Self {
         assert!(chance >= 0.0 && chance <= 1.0);
 
-        Self {chance, coeff}
+        Self { chance, coeff }
     }
 }
 
@@ -26,7 +26,7 @@ impl MutationMethod for GaussianMutation {
             let sign = if rng.gen_bool(0.5) { -1.0 } else { 1.0 };
 
             if rng.gen_bool(self.chance as _) {
-                *gene += sign * self.coeff * rng.gen::<f32>();
+                *gene += sign * self.coeff * rng.gen::<f64>();
             }
         }
     }
@@ -38,7 +38,7 @@ mod tests {
     use rand::SeedableRng;
     use rand_chacha::ChaCha8Rng;
 
-    fn actual(chance: f32, coeff: f32) -> Vec<f32> {
+    fn actual(chance: f64, coeff: f64) -> Vec<f64> {
         let mut child = vec![1.0, 2.0, 3.0, 4.0, 5.0].into_iter().collect();
         let mut rng = ChaCha8Rng::from_seed(Default::default());
 
@@ -48,7 +48,7 @@ mod tests {
     }
 
     mod given_zero_chance {
-        fn actual(coeff: f32) -> Vec<f32> {
+        fn actual(coeff: f64) -> Vec<f64> {
             super::actual(0.0, coeff)
         }
 
@@ -78,7 +78,7 @@ mod tests {
     }
 
     mod given_fifty_fifty_chance {
-        fn actual(coeff: f32) -> Vec<f32> {
+        fn actual(coeff: f64) -> Vec<f64> {
             super::actual(0.5, coeff)
         }
 
@@ -108,7 +108,7 @@ mod tests {
     }
 
     mod given_max_chance {
-        fn actual(coeff: f32) -> Vec<f32> {
+        fn actual(coeff: f64) -> Vec<f64> {
             super::actual(1.0, coeff)
         }
 

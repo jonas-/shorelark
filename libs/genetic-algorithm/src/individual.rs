@@ -2,7 +2,7 @@ use crate::*;
 
 pub trait Individual {
     fn chromosome(&self) -> &Chromosome;
-    fn fitness(&self) -> f32;
+    fn fitness(&self) -> f64;
     fn create(chromosome: Chromosome) -> Self;
 }
 
@@ -13,12 +13,12 @@ pub enum TestIndividual {
     WithChromosome { chromosome: Chromosome },
 
     // for tests that don't require access to chromosome
-    WithFitness { fitness: f32 },
+    WithFitness { fitness: f64 },
 }
 
 #[cfg(test)]
 impl TestIndividual {
-    pub fn new(fitness: f32) -> Self {
+    pub fn new(fitness: f64) -> Self {
         Self::WithFitness { fitness }
     }
 }
@@ -28,7 +28,7 @@ impl Individual for TestIndividual {
     fn create(chromosome: Chromosome) -> Self {
         Self::WithChromosome { chromosome }
     }
-    
+
     fn chromosome(&self) -> &Chromosome {
         match self {
             Self::WithChromosome { chromosome } => chromosome,
@@ -37,10 +37,9 @@ impl Individual for TestIndividual {
                 panic!("not supported for TestIndividual::WithFitness");
             }
         }
-        
     }
-    
-    fn fitness(&self) -> f32 {
+
+    fn fitness(&self) -> f64 {
         match self {
             Self::WithChromosome { chromosome } => {
                 chromosome.iter().sum()
@@ -50,5 +49,4 @@ impl Individual for TestIndividual {
             Self::WithFitness { fitness } => *fitness,
         }
     }
-
 }

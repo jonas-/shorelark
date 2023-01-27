@@ -96,11 +96,42 @@ pub fn redraw(
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
 
-    let mut simulation = sim::Simulation::new();
+    let mut rng = thread_rng();
+    let simulation = sim::Simulation::new();
     let world = simulation.world();
     log::info!("{:?}", world);
 
     let document = web_sys::window().unwrap().document().unwrap();
+
+    // handle button click
+    let simulation = Rc::new(RefCell::new(simulation));
+    let simulation_clone = simulation.clone();
+
+    let train = Closure::wrap(Box::new(move || {
+        web_sys::console::log_1(&"Button train clicked".into());
+
+        let mut simulation = simulation_clone.borrow_mut();
+        let statistics = simulation.train(&mut rng);
+
+        let stats_formated = format!(
+            "min={:.2}, max={:.2}, avg={:.2}",
+            statistics.min_fitness(),
+            statistics.max_fitness(),
+            statistics.avg_fitness()
+        );
+
+        web_sys::console::log_1(&stats_formated.into());
+    }) as Box<dyn FnMut()>);
+
+    document
+        .get_element_by_id("train")
+        .expect("should have a button on the page")
+        .dyn_ref::<web_sys::HtmlElement>()
+        .expect("#button-click-test be an `HtmlElement`")
+        .set_onclick(Some(train.as_ref().unchecked_ref()));
+    train.forget();
+
+    // drawing canvas
     let canvas = document.get_element_by_id("canvas").unwrap();
     let canvas: web_sys::HtmlCanvasElement = canvas
         .dyn_into::<web_sys::HtmlCanvasElement>()
@@ -133,10 +164,9 @@ fn main() {
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
 
-    let mut i = 0;
     *g.borrow_mut() = Some(Closure::new(move || {
         redraw(
-            &mut simulation,
+            &mut simulation.borrow_mut(),
             &mut context,
             viewport_width,
             viewport_height,
